@@ -1,0 +1,17 @@
+{
+    "file_format_version": "1.1.2",
+    "layer": {
+        "name": "VK_LAYER_VKCAPTURE_capture",
+        "type": "GLOBAL",
+        "library_path": "./libvkcapture.so",
+        "api_version": "1.3.0",
+        "implementation_version": "1",
+        "description": "vkcapture Vulkan frame, audio, and ImGui overlay capture layer",
+        "enable_environment": {
+            "ENABLE_VKCAPTURE": "1"
+        },
+        "disable_environment": {
+            "DISABLE_VKCAPTURE": "1"
+        }
+    }
+}

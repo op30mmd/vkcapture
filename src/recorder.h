@@ -1,0 +1,56 @@
+#pragma once
+/**
+ * recorder.h  —  Native in-game H.264/AAC MP4 recorder (Linux FFmpeg port)
+ *
+ * Uses libavcodec / libavformat / libswscale / libswresample with hardware
+ * encoder auto-detection (h264_nvenc, h264_vaapi, h264_qsv -> libx264 fallback)
+ * on an asynchronous worker thread so encoding never stalls the render thread.
+ */
+
+#include <cstdint>
+#include "platform.h"
+
+struct RecorderStats
+{
+    bool      isRecording;
+    bool      isStarting;
+    bool      isPaused;
+    uint64_t  recordedFrames;
+    uint64_t  droppedFrames;
+    uint64_t  durationMs;
+    uint32_t  width;
+    uint32_t  height;
+    uint32_t  fps;
+    uint32_t  bitrateKbps;
+    char      outputPath[MAX_PATH];
+    char      lastError[128];
+};
+
+void Recorder_Init();
+void Recorder_Shutdown();
+
+bool Recorder_Start(const char* customPath = nullptr, uint32_t fps = 30,
+                    uint32_t bitrateKbps = 8000, uint32_t width = 0, uint32_t height = 0);
+bool Recorder_WaitForReady(uint32_t timeoutMs = 5000);
+void Recorder_SetDefaultResolution(uint32_t width, uint32_t height);
+void Recorder_Pause();
+void Recorder_Resume();
+void Recorder_Stop();
+bool Recorder_StopSync(uint32_t timeoutMs = 5000);
+
+bool Recorder_IsRecording();
+bool Recorder_IsStarting();
+bool Recorder_IsPaused();
+void Recorder_GetStats(RecorderStats* outStats);
+
+void Recorder_SetAutoSaveOnExit(bool enable);
+bool Recorder_GetAutoSaveOnExit();
+
+void     Recorder_SetAudioBitrate(uint32_t kbps);
+uint32_t Recorder_GetAudioBitrate();
+void     Recorder_SetHardwareAccel(bool enable);
+bool     Recorder_GetHardwareAccel();
+
+bool Recorder_WantsFrame();
+void Recorder_OnFrameReady(const void* pixels, uint32_t width, uint32_t height,
+                           uint32_t stride, uint32_t vkFormat, uint64_t frameIdx);
